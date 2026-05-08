@@ -1,85 +1,43 @@
-# SQL Transactions & ACID Properties - Banking System
+# 📊 Elevate Lab SQL Task 13: SQL Transactions & ACID Properties - Banking System
 
-This repository demonstrates the core concepts of **SQL Transactions**, including **ACID properties**, **Isolation Levels**, and **Concurrency Handling**, using a practical Banking System example.
+A professional SQL project demonstrating the core concepts of SQL Transactions, including ACID properties, Isolation Levels, and Concurrency Handling. It covers money transfers, rollback scenarios, and row-level locking to ensure data integrity and prevent race conditions within a practical banking context.
 
-## Table of Contents
+## 📌 Project Objective
+The primary goal of this task is to understand how databases manage transactions and concurrency. It illustrates how to ensure that multiple operations succeed or fail as a single unit (Atomicity) and how to prevent simultaneous database operations from corrupting data (Isolation) using practical banking scenarios.
 
-- [Overview](#overview)
-- [ACID Properties](#acid-properties)
-- [Transaction Isolation Levels](#transaction-isolation-levels)
-- [Concurrency Handling](#concurrency-handling)
-- [How to Run](#how-to-run)
+## 🛠️ Technical Scope
+- **Database Management System**: SQL (MySQL / PostgreSQL / SQL Server compatible)
+- **Core Concepts**: SQL Transactions, ACID Properties (Atomicity, Consistency, Isolation, Durability), `COMMIT`, `ROLLBACK`
+- **Advanced Techniques**: Transaction Isolation Levels, Dirty Reads, Row-Level Locking (`FOR UPDATE`), Concurrency Handling
 
----
+## 🗄️ Database Schema
 
-## Overview
+### `accounts` Table
+| Column | Data Type | Constraint / Description |
+| :--- | :--- | :--- |
+| `acc_id` | INT | Primary Key |
+| `name` | VARCHAR(50) | Account holder name |
+| `balance` | DECIMAL(10,2) | Current balance |
 
-The demonstration is based on a simple banking database with an `accounts` table. It includes:
+## 💻 SQL Implementations
+Key operations demonstrated in the script:
 
-- **Money Transfer**: A basic transaction moving funds between accounts.
-- **Rollback Scenario**: Simulating failures to ensure data integrity.
-- **Locking**: Using row-level locks to prevent race conditions.
+- **Database & Schema Setup**: Creation of the `task13` database and the `accounts` table with initial seed data.
+- **Basic Transactions**: Executing a standard money transfer between two accounts, utilizing `START TRANSACTION` and `COMMIT` to ensure both deduction and addition succeed together.
+- **Simulate Failure & ROLLBACK**: Demonstrating atomicity by intentionally introducing a failure mid-transaction and using `ROLLBACK` to revert all changes, preventing partial transfers.
+- **ACID Properties**: Providing practical examples and explanations for Atomicity, Consistency, Isolation, and Durability in the context of the banking system.
+- **Transaction Isolation Levels**: Exploring how different levels (`READ UNCOMMITTED`, `READ COMMITTED`, `REPEATABLE READ`, `SERIALIZABLE`) handle visibility of uncommitted data, including a demonstration of "Dirty Reads".
+- **Concurrency Handling (Row Locking)**: Applying row-level locks using `FOR UPDATE` to prevent race conditions when multiple sessions attempt to update the same account simultaneously.
 
-```sql
--- Transfer ₹2000 from Alice → Bob
-START TRANSACTION;
-UPDATE accounts SET balance = balance - 2000 WHERE acc_id = 1;
-UPDATE accounts SET balance = balance + 2000 WHERE acc_id = 2;
-COMMIT;
-```
+## 🚀 Setup & Execution
 
-## ACID Properties
+- **Initialize**: Execute the script to create the `task13` database and `accounts` table.
+- **Run Basic Transactions**: Observe the successful execution of the money transfer transaction.
+- **Test Rollbacks**: Execute the failure scenario to see how `ROLLBACK` maintains original balances.
+- **Experiment with Isolation Levels**: Open two separate database sessions to test the Dirty Read scenario and observe how changing isolation levels prevents read anomalies.
+- **Test Concurrency**: Run the row-locking example to understand how concurrent updates are managed and prevented from overlapping.
 
-This project illustrates the four pillars of database reliability:
+> [!IMPORTANT]
+> Understanding transaction isolation and concurrency control is critical for building robust applications. While setting a high isolation level like `SERIALIZABLE` prevents all read anomalies, it can severely impact performance due to heavy locking. Choosing the right isolation level involves carefully balancing data consistency requirements with system concurrency and performance.
 
-1.  **Atomicity (A)**: All operations in a transaction succeed, or none do. If a system crash occurs mid-transfer, a `ROLLBACK` ensures no money is lost or created.
-2.  **Consistency (C)**: The database remains valid according to predefined rules.
-    - _Example_: A `CHECK (balance >= 0)` constraint prevents accounts from having negative balances.
-3.  **Isolation (I)**: Transactions do not interfere with each other. This is managed through isolation levels.
-4.  **Durability (D)**: Once a transaction is `COMMIT`ted, the changes are permanent, even in the event of a power failure or crash.
-
-## Transaction Isolation Levels
-
-The script demonstrates how different isolation levels affect data visibility and prevent common anomalies:
-
-| Level                | Prevents                             |
-| :------------------- | :----------------------------------- |
-| **READ UNCOMMITTED** | Nothing (allows Dirty Reads)         |
-| **READ COMMITTED**   | Dirty Reads                          |
-| **REPEATABLE READ**  | Non-Repeatable Reads (MySQL Default) |
-| **SERIALIZABLE**     | Phantom Reads                        |
-
-### Dirty Read Example
-
-A "Dirty Read" occurs when a transaction reads data that has been modified by another transaction but not yet committed.
-
-```sql
--- Session B sees uncommitted changes from Session A
-SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
-SELECT * FROM accounts;
-```
-
-## Concurrency Handling
-
-To prevent multiple users from updating the same record simultaneously (race conditions), we use **Row Locking** with `FOR UPDATE`.
-
-```sql
-START TRANSACTION;
-SELECT * FROM accounts WHERE acc_id = 1 FOR UPDATE;
--- This row is now locked until the transaction completes
-UPDATE accounts SET balance = balance - 1000 WHERE acc_id = 1;
-COMMIT;
-```
-
-## How to Run
-
-1.  Open your MySQL client (e.g., MySQL Workbench or CLI).
-2.  Execute the commands in `task13.sql` sequentially.
-3.  The script will:
-    - Create the `task13` database.
-    - Create the `accounts` table.
-    - Run various transaction scenarios for you to observe the results.
-
----
-
-_Developed as part of SQL Training - Task 13_
+*Developed for Elevate Lab Internship Program - SQL Practice and Interview Preparation.*
